@@ -185,6 +185,7 @@ void BoneAttachment3D::_transform_changed() {
 
 void BoneAttachment3D::set_bone_name(const String &p_name) {
 	bone_name = p_name;
+	first_attachment = true;
 	Skeleton3D *sk = get_skeleton();
 	if (sk) {
 		set_bone_idx(sk->find_bone(bone_name));
@@ -201,6 +202,7 @@ void BoneAttachment3D::set_bone_idx(const int &p_idx) {
 	}
 
 	bone_idx = p_idx;
+	first_attachment = true;
 
 	Skeleton3D *sk = get_skeleton();
 	if (sk) {
@@ -255,6 +257,7 @@ void BoneAttachment3D::set_use_external_skeleton(bool p_use_external_skeleton) {
 		_update_external_skeleton_cache();
 		_check_bind();
 		_transform_changed();
+		first_attachment = true;
 	}
 
 	notify_property_list_changed();
@@ -267,6 +270,7 @@ bool BoneAttachment3D::get_use_external_skeleton() const {
 void BoneAttachment3D::set_external_skeleton(NodePath p_external_skeleton) {
 	external_skeleton_node = p_external_skeleton;
 	_update_external_skeleton_cache();
+	first_attachment = true;
 	notify_property_list_changed();
 }
 
@@ -317,6 +321,11 @@ void BoneAttachment3D::on_skeleton_update() {
 					}
 				} else {
 					set_transform(sk->get_bone_global_pose(bone_idx));
+				}
+				
+				if (first_attachment) {
+					first_attachment = false;
+					emit_signal(SNAME("bone_attached"), bone_idx);
 				}
 			} else {
 				if (!_override_dirty) {
@@ -380,6 +389,8 @@ void BoneAttachment3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_use_external_skeleton"), &BoneAttachment3D::get_use_external_skeleton);
 	ClassDB::bind_method(D_METHOD("set_external_skeleton", "external_skeleton"), &BoneAttachment3D::set_external_skeleton);
 	ClassDB::bind_method(D_METHOD("get_external_skeleton"), &BoneAttachment3D::get_external_skeleton);
+
+	ADD_SIGNAL(MethodInfo("bone_attached", PropertyInfo(Variant::INT, "bone_idx")));
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "bone_name"), "set_bone_name", "get_bone_name");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_idx"), "set_bone_idx", "get_bone_idx");
