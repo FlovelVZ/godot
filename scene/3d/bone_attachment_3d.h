@@ -43,6 +43,7 @@ class BoneAttachment3D : public Node3D {
 	bool override_pose = false;
 	bool _override_dirty = false;
 	bool overriding = false;
+	bool first_attachment = true;
 
 	bool use_external_skeleton = false;
 	NodePath external_skeleton_node;
