@@ -97,6 +97,7 @@ GDScriptParser::GDScriptParser() {
 		register_annotation(MethodInfo("@icon", PropertyInfo(Variant::STRING, "icon_path")), AnnotationInfo::SCRIPT, &GDScriptParser::icon_annotation);
 		register_annotation(MethodInfo("@static_unload"), AnnotationInfo::SCRIPT, &GDScriptParser::static_unload_annotation);
 		// Onready annotation.
+		register_annotation(MethodInfo("@serialize"), AnnotationInfo::VARIABLE, &GDScriptParser::serialize_annotation);
 		register_annotation(MethodInfo("@onready"), AnnotationInfo::VARIABLE, &GDScriptParser::onready_annotation);
 		// Export annotations.
 		register_annotation(MethodInfo("@export"), AnnotationInfo::VARIABLE, &GDScriptParser::export_annotations<PROPERTY_HINT_NONE, Variant::NIL>);
@@ -4259,6 +4260,18 @@ bool GDScriptParser::static_unload_annotation(AnnotationNode *p_annotation, Node
 		return false;
 	}
 	class_node->annotated_static_unload = true;
+	return true;
+}
+
+bool GDScriptParser::serialize_annotation(AnnotationNode *p_annotation, Node *p_target, ClassNode *p_class) {
+	ERR_FAIL_COND_V_MSG(p_target->type != Node::VARIABLE, false, R"("@serialize" annotation can only be applied to class variables.)");
+	if (current_class && !ClassDB::is_parent_class(current_class->get_datatype().native_type, SNAME("Node"))) {
+		push_error(R"("@onready" can only be used in classes that inherit "Node".)", p_annotation);
+		return false;
+	}
+	VariableNode *variable = static_cast<VariableNode *>(p_target);
+	variable->serialize = true;
+	variable->export_info.serialize = true;
 	return true;
 }
 

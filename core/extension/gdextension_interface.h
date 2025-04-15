@@ -239,6 +239,7 @@ typedef struct {
 	uint32_t hint; // Bitfield of `PropertyHint` (defined in `extension_api.json`).
 	GDExtensionStringPtr hint_string;
 	uint32_t usage; // Bitfield of `PropertyUsageFlags` (defined in `extension_api.json`).
+	bool serialize;
 } GDExtensionPropertyInfo;
 
 typedef struct {
