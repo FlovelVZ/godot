@@ -55,6 +55,8 @@ class BoneAttachment3D : public Node3D {
 	bool updating = false;
 	void _transform_changed();
 	void _update_external_skeleton_cache();
+	
+	void _emit_bone_attached();
 
 protected:
 	void _validate_property(PropertyInfo &p_property) const;

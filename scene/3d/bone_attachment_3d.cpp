@@ -316,6 +316,10 @@ void BoneAttachment3D::_notification(int p_what) {
 	}
 }
 
+void BoneAttachment3D::_emit_bone_attached() {
+	emit_signal(SNAME("bone_attached"), bone_idx, this);
+}
+
 void BoneAttachment3D::on_skeleton_update() {
 	if (updating) {
 		return;
@@ -333,7 +337,7 @@ void BoneAttachment3D::on_skeleton_update() {
 				
 				if (first_attachment) {
 					first_attachment = false;
-					emit_signal(SNAME("bone_attached"), bone_idx);
+					call_deferred("_emit_bone_attached");
 				}
 			} else {
 				if (!_override_dirty) {
@@ -387,6 +391,7 @@ void BoneAttachment3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bone_idx"), &BoneAttachment3D::get_bone_idx);
 
 	ClassDB::bind_method(D_METHOD("on_skeleton_update"), &BoneAttachment3D::on_skeleton_update);
+	ClassDB::bind_method(D_METHOD("_emit_bone_attached"), &BoneAttachment3D::_emit_bone_attached);
 
 	ClassDB::bind_method(D_METHOD("set_override_pose", "override_pose"), &BoneAttachment3D::set_override_pose);
 	ClassDB::bind_method(D_METHOD("get_override_pose"), &BoneAttachment3D::get_override_pose);
@@ -396,7 +401,7 @@ void BoneAttachment3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_external_skeleton", "external_skeleton"), &BoneAttachment3D::set_external_skeleton);
 	ClassDB::bind_method(D_METHOD("get_external_skeleton"), &BoneAttachment3D::get_external_skeleton);
 
-	ADD_SIGNAL(MethodInfo("bone_attached", PropertyInfo(Variant::INT, "bone_idx")));
+	ADD_SIGNAL(MethodInfo("bone_attached", PropertyInfo(Variant::INT, "bone_idx"), PropertyInfo(Variant::OBJECT, "bone_attachment", PROPERTY_HINT_RESOURCE_TYPE, "BoneAttachment3D")));
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING_NAME, "bone_name"), "set_bone_name", "get_bone_name");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_idx"), "set_bone_idx", "get_bone_idx");
