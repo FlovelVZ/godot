@@ -41,6 +41,7 @@ PropertyInfo::operator Dictionary() const {
 	d["hint"] = hint;
 	d["hint_string"] = hint_string;
 	d["usage"] = usage;
+	d["serialize"] = serialize;
 	return d;
 }
 
@@ -69,6 +70,10 @@ PropertyInfo PropertyInfo::from_dict(const Dictionary &p_dict) {
 
 	if (p_dict.has("usage")) {
 		pi.usage = p_dict["usage"];
+	}
+
+	if (p_dict.has("serialize")) {
+		pi.serialize = p_dict["serialize"];
 	}
 
 	return pi;
